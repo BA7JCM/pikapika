@@ -158,3 +158,22 @@ jobs:
           cat ci/linux_font.yaml >> pubspec.yaml
           hover build linux-appimage
 
+      - name: Build (ios)
+        if: steps.check_asset.outputs.skip_build != 'true' && matrix.config.target == 'ios'
+        run: |
+          sh scripts/build-ipa.sh
+
+      - name: Build (android-arm32)
+        if: steps.check_asset.outputs.skip_build != 'true' && matrix.config.target == 'android-arm32'
+        run: |
+          sh scripts/build-apk-arm.sh
+
+      - name: Build (android-arm64)
+        if: steps.check_asset.outputs.skip_build != 'true' && matrix.config.target == 'android-arm64'
+        run: |
+          sh scripts/build-apk-arm64.sh
+
+      - name: Build (android-x86_64)
+        if: steps.check_asset.outputs.skip_build != 'true' && matrix.config.target == 'android-x86_64'
+        run: |
+          sh scripts/build-apk-x64.sh
