@@ -143,11 +143,17 @@ jobs:
         if: steps.check_asset.outputs.skip_build != 'true' && matrix.config.target == 'windows'
         run: |
           hover build windows
+          cd go\build\outputs\windows-release
+          DEL flutter_engine.pdb
+          DEL flutter_engine.exp
+          DEL flutter_engine.lib
+          zip -r ../../../../build/build.zip ./*
 
       - name: Build (macos)
         if: steps.check_asset.outputs.skip_build != 'true' && matrix.config.target == 'macos'
         run: |
           hover build darwin-dmg
+          mv go/build/outputs/darwin-dmg-release/*.dmg build/build.dmg
 
       - name: Build (linux)
         if: steps.check_asset.outputs.skip_build != 'true' && matrix.config.target == 'linux'
@@ -157,6 +163,7 @@ jobs:
           mv SourceHanSerifCN-Regular.ttf fonts/Roboto.ttf
           cat ci/linux_font.yaml >> pubspec.yaml
           hover build linux-appimage
+          mv go/build/outputs/linux-appimage-release/*.AppImage build/build.AppImage
 
       - name: Build (ios)
         if: steps.check_asset.outputs.skip_build != 'true' && matrix.config.target == 'ios'
@@ -177,3 +184,20 @@ jobs:
         if: steps.check_asset.outputs.skip_build != 'true' && matrix.config.target == 'android-x86_64'
         run: |
           sh scripts/build-apk-x64.sh
+
+      - name: Sign APK (Android)
+        if: steps.check_asset.outputs.skip_build != 'true' && ( matrix.config.target == 'android-arm32' || matrix.config.target == 'android-arm64' || matrix.config.target == 'android-x86_64' )
+        uses: r0adkll/sign-android-release@v1
+        id: sign_app
+        with:
+          releaseDirectory: build/app/outputs/flutter-apk
+          signingKeyBase64: ${{ secrets.SIGN_FILE_BASE64 }}
+          alias: ${{ secrets.KEY_ALIAS }}
+          keyStorePassword: ${{ secrets.KEYSTORE_PASSWORD }}
+          keyPassword: ${{ secrets.KEY_PASSWORD }}
+
+      - name: Upload Asset (All)
+        run: |
+          cd ci
+          go run ./cmd/upload_asset
+

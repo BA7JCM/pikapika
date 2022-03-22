@@ -43,7 +43,7 @@ func main() {
         var releaseFileName string
         switch target {
         case "macos":
-                releaseFileName = fmt.Sprintf("pikapika-v1.4.1-android-arm32.apk")
+                releaseFileName = fmt.Sprintf("pikapika-%v-macos-intel.dmg", version.Code)
         case "ios":
                 releaseFileName = fmt.Sprintf("pikapika-%v-ios-nosign.ipa", version.Code)
         case "windows":

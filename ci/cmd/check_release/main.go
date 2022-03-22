@@ -80,7 +80,7 @@ func main() {
 		if createReleaseResponse.StatusCode != 201 {
 			buff, err = ioutil.ReadAll(createReleaseResponse.Body)
 			if err != nil {
-				panic(nil)
+				panic(err)
 			}
 			println(string(buff))
 			panic("NOT 201")
