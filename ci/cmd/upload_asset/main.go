@@ -44,7 +44,6 @@ func main() {
 	var releaseFilePath string
 	var releaseFileName string
 	var contentType string
-	var contentLength int64
 	switch target {
 	case "macos":
 		releaseFilePath = "build/build.dmg"
@@ -76,11 +75,6 @@ func main() {
 		contentType = "application/octet-stream"
 	}
 	releaseFilePath = path.Join("..", releaseFilePath)
-	info, err := os.Stat(releaseFilePath)
-	if err != nil {
-		panic(err)
-	}
-	contentLength = info.Size()
 	// get version
 	getReleaseRequest, err := http.NewRequest(
 		"GET",
@@ -123,7 +117,6 @@ func main() {
 	uploadRequest.Header.Set("User-Agent", ua)
 	uploadRequest.Header.Set("Authorization", ghToken)
 	uploadRequest.Header.Set("Content-Type", contentType)
-	uploadRequest.Header.Set("Content-Length", fmt.Sprintf("%v", contentLength))
 	uploadResponse, err := http.DefaultClient.Do(uploadRequest)
 	if err != nil {
 		panic(err)
